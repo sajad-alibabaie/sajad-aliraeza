@@ -6,41 +6,43 @@ import timeit
 # function to count the divisors
 def countDivisors(n):
     sum = 1
-    for i in range(2, (int)(math.sqrt(n)) + 1):
-        if (n % i == 0):
+    end = int(math.sqrt(n)) + 1
+    for i in range(2, end):
+        if n % i == 0:
             sum += i
 
-            if (n / i != i):
+            if n / i != i:
                 sum += (n / i)
 
-    if (sum == n):
+    if sum == n:
         return True
     return False
 
 
-def handlethread(start, end, name):
+def handelthread(start, end, name):
     for j in range(start, end):
-        if (countDivisors(j)):
+        if countDivisors(j):
             print("thread :", name, " find", j)
 
 
 n = int(input("enter num:"))
 threadcount = int(input("enter thread count:"))
 lentgh = int(n / threadcount)
-
-start = timeit.default_timer()
-k = 0
-en = lentgh
+st, en = 0, lentgh
 threads = []
-for j in range(threadcount):
-    threads.append(threading.Thread(target=handlethread, args=(k, en, j + 1)))
-    threads[j].start()
-    threads[j].join()
-    k += lentgh
+start = timeit.default_timer()
+
+for j in range(threadcount - 1):
+    threads.append(threading.Thread(target=handelthread, args=(st, en, j + 1)))
+    st = en
     en += lentgh
-    if j == threadcount - 1:
-        if n % threadcount > 0:
-            en += n % threadcount
+
+threads.append(threading.Thread(target=handelthread, args=(st, n, "last one")))
+
+for thread in threads:
+    thread.start()
+for thread in threads:
+    thread.join()
 
 stop = timeit.default_timer()
 
